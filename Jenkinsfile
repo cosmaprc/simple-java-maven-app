@@ -8,6 +8,9 @@ pipeline {
     options {
         skipStagesAfterUnstable()
     }
+    environment {
+        CI = 'true'
+    }
     stages {
         stage('Build') {
             steps {
@@ -24,8 +27,20 @@ pipeline {
                 }
             }
         }
-        stage('Deliver') { 
+        stage('Deliver for development') {
+            when {
+                branch 'development'
+            }
             steps {
+                sh './jenkins/scripts/deliver.sh' 
+            }
+        }
+        stage('Deploy for production') {
+            when {
+                branch 'production'
+            }
+            steps {
+                input message: 'Finished using the web site? (Click "Proceed" to continue)'
                 sh './jenkins/scripts/deliver.sh' 
             }
         }
